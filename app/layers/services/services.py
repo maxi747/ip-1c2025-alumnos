@@ -26,9 +26,9 @@ def filterByCharacter(name):
     filtered_cards = []
 
     for card in getAllImages():
+        if name.lower() in card.name.lower():
         # debe verificar si el name está contenido en el nombre de la card, antes de agregarlo al listado de filtered_cards.
-        filtered_cards.append(card)
-
+            filtered_cards.append(card)
     return filtered_cards
 
 # función que filtra las cards según su tipo.

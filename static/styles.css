@@ -140,3 +140,17 @@ table.table td i {
     margin-top: 6px;
     font-size: 95%;
 }
+
+/* Spinner overlay */
+.spinner-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(255,255,255,0.75);
+  display: none;           /* arranca oculto */
+  align-items: center;     /* centra verticalmente */
+  justify-content: center; /* centra horizontalmente */
+  z-index: 2000;           /* por encima de todo */
+}

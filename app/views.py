@@ -6,51 +6,69 @@ from django.contrib.auth import logout
 def index_page(request):
     return render(request, 'index.html')
 
-# esta función obtiene 2 listados: uno de las imágenes de la API y otro de favoritos, ambos en formato Card, y los dibuja en el template 'home.html'.
+# esta función obtiene dos listados: uno de las imágenes de la API y otro de favoritos,
+# ambos en formato Card, y los dibuja en el template 'home.html'.
 def home(request):
-    print("🔵 En la vista HOME")
     images = services.getAllImages()
-    favourite_list = []
-    print("🔴 images:", images)
-    return render(request, 'home.html', {'images': images, 'favourite_list': favourite_list})
+    if request.user.is_authenticated:
+        favourite_list = services.getAllFavourites(request)
+    else:
+        favourite_list = []
+    return render(request, 'home.html', {
+        'images': images,
+        'favourite_list': favourite_list
+    })
 
-# función utilizada en el buscador.
+# función utilizada en el buscador
 def search(request):
-    name = request.POST.get('query', '').strip()  # toma lo que el usuario escribe y elimina espacios en blanco
-
+    name = request.POST.get('query', '').strip()
     if name == '':
-        # Si no puso nada, mostramos todos los Pokémon (como la galería)
         images = services.getAllImages()
     else:
-        # Si escribió algo, filtramos por nombre (total o parcial)
         images = services.filterByCharacter(name)
-
-    favourite_list = []
-    return render(request, 'home.html', {'images': images, 'favourite_list': favourite_list})
-
-# función utilizada para filtrar por el tipo del Pokémon
-def filter_by_type(request):
-    type = request.POST.get('type', '')
-    print("🔎 Buscando tipo:", type)  # DEBUG: muestra qué tipo está llegando
-    if type != '':
-        images = services.filterByType(type)
-        favourite_list = []
-        return render(request, 'home.html', { 'images': images, 'favourite_list': favourite_list })
+    if request.user.is_authenticated:
+        favourite_list = services.getAllFavourites(request)
     else:
-        return redirect('home')
+        favourite_list = []
+    return render(request, 'home.html', {
+        'images': images,
+        'favourite_list': favourite_list
+    })
+
+# función utilizada para filtrar por tipo
+def filter_by_type(request):
+    type_value = request.POST.get('type', '').strip()
+    if type_value:
+        images = services.filterByType(type_value)
+        if request.user.is_authenticated:
+            favourite_list = services.getAllFavourites(request)
+        else:
+            favourite_list = []
+        return render(request, 'home.html', {
+            'images': images,
+            'favourite_list': favourite_list
+        })
+    return redirect('home')
 
 # Estas funciones se usan cuando el usuario está logueado en la aplicación.
 @login_required
 def getAllFavouritesByUser(request):
-    pass
+    favourite_list = services.getAllFavourites(request)
+    return render(request, 'favourites.html', {
+        'favourite_list': favourite_list
+    })
 
 @login_required
 def saveFavourite(request):
-    pass
+    if request.method == 'POST':
+        services.saveFavourite(request)
+    return redirect(request.GET.get('next', 'home'))
 
 @login_required
 def deleteFavourite(request):
-    pass
+    if request.method == 'POST':
+        services.deleteFavourite(request)
+    return redirect('favoritos')
 
 @login_required
 def exit(request):

@@ -1,18 +1,22 @@
 {% extends 'header.html' %}
 {% block content %}
 <main>
-    <h1 class="text-center">Buscador de Pokemon</h1>
+    <h1 class="text-center">Buscador de Pokémon</h1>
 
+    <!-- Buscador -->
     <div class="d-flex justify-content-center mb-3">
-        <!-- Buscador del sitio -->
         <form class="d-flex" action="{% url 'buscar' %}" method="POST">
             {% csrf_token %}
-            <input class="form-control me-2" type="search" name="query"
-                   placeholder="Pikachu, Charizard, Ditto" aria-label="Search">
+            <input class="form-control me-2"
+                   type="search"
+                   name="query"
+                   placeholder="Pikachu, Charizard, Ditto"
+                   aria-label="Search">
             <button class="btn btn-outline-success" type="submit">Buscar</button>
         </form>
     </div>
 
+    <!-- Filtros por tipo -->
     <div class="d-flex gap-1 col-2 mx-auto mb-4">
         <form method="post" action="{% url 'filter_by_type' %}">
             {% csrf_token %}
@@ -31,6 +35,7 @@
         </form>
     </div>
 
+    <!-- Galería -->
     <div class="row row-cols-1 row-cols-md-3 g-4">
         {% if images|length == 0 %}
             <h2 class="text-center">La búsqueda no arrojó resultados...</h2>
@@ -46,7 +51,9 @@
                     mb-3 ms-4" style="max-width: 540px;">
                     <div class="row g-0">
                         <div class="col-md-4">
-                            <img src="{{ img.image }}" class="card-img-top" alt="{{ img.name }}">
+                            <img src="{{ img.image }}"
+                                 class="card-img-top"
+                                 alt="{{ img.name }}">
                         </div>
                         <div class="col-md-8">
                             <div class="card-body">
@@ -82,11 +89,15 @@
 
                                     {% if img.id in favourite_ids %}
                                         <button type="submit"
-                                                class="btn btn-primary btn-sm"
-                                                disabled>✔ Favorito</button>
+                                                class="btn btn-secondary btn-sm"
+                                                disabled title="Ya agregado a favoritos">
+                                            ✔ Favorito
+                                        </button>
                                     {% else %}
                                         <button type="submit"
-                                                class="btn btn-outline-primary btn-sm">❤️ Favorito</button>
+                                                class="btn btn-outline-primary btn-sm">
+                                            ❤️ Favorito
+                                        </button>
                                     {% endif %}
                                 </form>
                             </div>

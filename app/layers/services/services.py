@@ -51,11 +51,15 @@ def filterByType(type_filter):
 # añadir favoritos (usado desde el template 'home.html')
 def saveFavourite(request):
     """
-    Convierte el POST del formulario en un objeto Card y lo guarda en la BD.
+    Convierte el POST del formulario en un objeto Card, 
+    le asigna explícitamente el usuario autenticado y lo guarda en la BD.
     """
+    # 1) Mapeo de los campos recibidos a mi objeto Card
     card = fromTemplateIntoCard(request)
+    # 2) Me aseguro de que tenga siempre user (login_required garantiza que exista)
+    card.user = request.user
+    # 3) Persisto en la BD (repositorio espera que card.user no sea None)
     return repo_save(card)
-
 
 # lista todos los favoritos del usuario (usado desde template 'favourites.html')
 def getAllFavourites(request):

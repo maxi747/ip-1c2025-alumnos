@@ -4,26 +4,28 @@ from sqlite3 import IntegrityError
 from app.models import Favourite
 
 
+
 def save_favourite(fav):
     try:
-        fav = Favourite.objects.create(
-            name=fav.name,  # Nombre del personaje
-            id=fav.id,
-            types=fav.types,  # tipos
-            height=fav.height,  # altura
-            weight=fav.weight,  # peso
-            image=fav.image,  # Imagen
-            user=fav.user  # Usuario autenticado
+        # Usamos update_or_create sobre la PK id para evitar colisiones
+        obj, created = Favourite.objects.update_or_create(
+            id=fav.id,             # lookup sobre el mismo campo PK
+            defaults={
+                'name':            fav.name,
+                'types':           fav.types,
+                'height':          fav.height,
+                'weight':          fav.weight,
+                # Aquí cambiamos fav.base_experience por fav.base
+                'base_experience': fav.base,
+                'image':           fav.image,
+                'user':            fav.user,
+            }
         )
-        return fav
+        return obj
     except IntegrityError as e:
         print(f"Error de integridad al guardar el favorito: {e}")
         return None
-    except KeyError as e:
-        print(f"Error de datos al guardar el favorito: Falta el campo {e}")
-        return None
-
-
+    
 def get_all_favourites(user):
     return list(Favourite.objects.filter(user=user).values(
         'id', 'name', 'height', 'weight', 'types','base_experience', 'image'
